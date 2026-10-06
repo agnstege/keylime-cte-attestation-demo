@@ -1,0 +1,18 @@
+# /etc/ima/ima-policy - loaded by systemd at boot.
+# Executables only, so CTE GuardPoint reads on /data don't flood the log.
+# Comments must be on their own lines: the kernel rejects the whole policy on any unknown token.
+# proc, sysfs, debugfs, tmpfs, devpts, binfmt_misc, securityfs, selinuxfs, cgroup, cgroup2, nsfs
+dont_measure fsmagic=0x9fa0
+dont_measure fsmagic=0x62656572
+dont_measure fsmagic=0x64626720
+dont_measure fsmagic=0x01021994
+dont_measure fsmagic=0x1cd1
+dont_measure fsmagic=0x42494e4d
+dont_measure fsmagic=0x73636673
+dont_measure fsmagic=0xf97cff8c
+dont_measure fsmagic=0x27e0eb
+dont_measure fsmagic=0x63677270
+dont_measure fsmagic=0x6e736673
+measure func=BPRM_CHECK mask=MAY_EXEC
+measure func=FILE_MMAP mask=MAY_EXEC
+measure func=MODULE_CHECK

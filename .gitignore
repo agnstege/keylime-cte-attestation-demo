@@ -1,0 +1,26 @@
+# Secrets and real configuration
+*.env
+!broker/broker.env.example
+
+# Generated Keylime policies and captures
+mb.json
+runtime.json
+allowlist*.txt
+wl/
+*.log
+
+# Keys and certificates
+*.pem
+*.key
+*.crt
+*.der
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store

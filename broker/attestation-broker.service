@@ -1,0 +1,16 @@
+[Unit]
+Description=Keylime -> CipherTrust CTE attestation gate
+After=network-online.target keylime_verifier.service
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/etc/attestation-broker.env
+ExecStart=/usr/bin/python3 /opt/attestation-broker/broker.py
+Restart=always
+RestartSec=3
+# Needs to read Keylime's tenant client certs
+User=keylime
+Group=keylime
+
+[Install]
+WantedBy=multi-user.target
