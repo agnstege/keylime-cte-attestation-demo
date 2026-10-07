@@ -1,0 +1,22 @@
+flowchart LR
+  subgraph W[TDX Confidential VM · Azure / GCP]
+    KA[Intel TDX CPU<br/>hardware quote + MRTD]
+    CTE[CTE agent<br/>GuardPoint /data]
+  end
+  CM[(CipherTrust Manager)]
+  subgraph V[Intel Tiber Trust Services]
+    KV[Attestation verifier]
+    B[Appraisal policy]
+  end
+  CTE ~~~ CM
+  CM ~~~ KV
+  KA -- TDX quote --> CTE
+  CTE -- evidence --> CM
+  CM -- forward evidence --> KV
+  KV -- check against --> B
+  KV -- verdict --> CM
+  CM -- key release / withhold --> CTE
+  classDef same fill:#e8ecef,stroke:#5a6772,color:#17202a
+  classDef swapped fill:#dbe8fb,stroke:#2457a6,color:#17202a
+  class CM,CTE same
+  class KA,KV,B swapped

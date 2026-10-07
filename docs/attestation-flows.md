@@ -1,5 +1,70 @@
 # Attestation flows: real hardware vs this lab
 
+## At a glance
+
+The two diagrams use the same layout: workload on the left, CipherTrust Manager in the middle, verifier on the right. **Grey** boxes are identical in both; **coloured** boxes are swapped for a lab stand-in.
+
+![Real TDX flow vs home lab](img/flow-comparison.png)
+
+**Real hardware: Intel TDX and Intel Tiber Trust Services**
+
+```mermaid
+flowchart LR
+  subgraph W[TDX Confidential VM · Azure / GCP]
+    KA[Intel TDX CPU<br/>hardware quote + MRTD]
+    CTE[CTE agent<br/>GuardPoint /data]
+  end
+  CM[(CipherTrust Manager)]
+  subgraph V[Intel Tiber Trust Services]
+    KV[Attestation verifier]
+    B[Appraisal policy]
+  end
+  CTE ~~~ CM
+  CM ~~~ KV
+  KA -- TDX quote --> CTE
+  CTE -- evidence --> CM
+  CM -- forward evidence --> KV
+  KV -- check against --> B
+  KV -- verdict --> CM
+  CM -- key release / withhold --> CTE
+  classDef same fill:#e8ecef,stroke:#5a6772,color:#17202a
+  classDef swapped fill:#dbe8fb,stroke:#2457a6,color:#17202a
+  class CM,CTE same
+  class KA,KV,B swapped
+```
+
+**Home lab: Keylime and the broker on Proxmox**
+
+```mermaid
+flowchart LR
+  subgraph W[Workload VM · Proxmox]
+    KA[Keylime agent<br/>software vTPM + IMA]
+    CTE[CTE-U agent<br/>GuardPoint /data]
+  end
+  CM[(CipherTrust Manager)]
+  subgraph V[Verifier VM]
+    KV[Keylime verifier]
+    B[Broker]
+  end
+  KA ~~~ CTE
+  CTE ~~~ CM
+  CM ~~~ KV
+  KA -- TPM quote + IMA log --> KV
+  KV -- verdict / webhook --> B
+  B -- PATCH rule: permit / deny --> CM
+  CM -- policy push --> CTE
+  classDef same fill:#e8ecef,stroke:#5a6772,color:#17202a
+  classDef swapped fill:#dcf1e8,stroke:#1f7a5a,color:#17202a
+  class CM,CTE same
+  class KA,KV,B swapped
+```
+
+What to point out:
+- **Same:** CipherTrust Manager, the CTE agent and the GuardPoint, and the outcome (data readable only while the workload attests).
+- **Evidence path:** on real hardware, evidence goes through the CTE agent and CipherTrust Manager to Intel. In the lab, the Keylime verifier collects it directly, and CipherTrust Manager never sees it.
+- **Decision and enforcement:** on real hardware, CipherTrust Manager acts on Intel's verdict and releases or withholds keys itself. In the lab, the broker acts on Keylime's verdict by changing a CTE policy rule.
+- **Root of trust:** the CPU's hardware quote, versus a software vTPM.
+
 ## Who triggers attestation
 
 - **Real flow (Intel TDX on Azure or GCP):** the CTE agent starts it. Registering with Confidential Computing enabled and a client profile that names Intel Tiber Trust Services makes the agent send TDX evidence to CipherTrust Manager. CipherTrust Manager forwards it to Intel and releases or withholds keys based on the verdict.
