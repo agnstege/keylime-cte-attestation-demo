@@ -229,10 +229,11 @@ Screens:
 
 1. **Untrusted at boot.** Stop the broker, reboot the workload, start the broker. `cat /data/secret.txt` is denied. B shows `WITHHOLD ... broker start (fail closed)`.
 2. **Attest.** The verifier reaches `Get Quote`. B shows `>>> RELEASE keys`, C shows the effect flip to permit, and in A `cat` returns the plaintext.
-3. **Tamper.** Copy [`scripts/tamper.sh`](../scripts/tamper.sh) to the workload once (from the verifier: `scp /root/kit/scripts/tamper.sh root@workload.home.arpa:/root/`), then on the workload:
+3. **Tamper.** From the verifier, stream [`scripts/tamper.sh`](../scripts/tamper.sh) into a shell on the workload:
    ```bash
-   bash /root/tamper.sh      # via bash, not ./tamper.sh, or the script itself trips IMA
+   ssh root@workload.home.arpa 'bash -s' < /root/kit/scripts/tamper.sh
    ```
+   Nothing is copied to the workload, so it survives every snapshot rollback, and IMA never measures the script itself (bash reads it from stdin rather than executing a file).
    IMA measures the unknown `/root/implant.sh`, the verifier reports `Invalid Quote` and sends the webhook, and B shows `>>> WITHHOLD keys`. The script prints how many seconds it took for access to disappear.
 4. **Data at rest is ciphertext** (optional): read the raw file from the Proxmox host or a non-CTE boot.
 5. **Recover**, either way:

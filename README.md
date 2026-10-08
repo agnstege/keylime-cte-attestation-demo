@@ -54,7 +54,7 @@ flowchart LR
 | [`config/workload/`](config/workload) | Keylime agent config and the IMA policy |
 | [`scripts/build-policies.sh`](scripts/build-policies.sh) | Builds Keylime measured-boot and runtime policies from the workload (run on the verifier) |
 | [`scripts/reset-demo.sh`](scripts/reset-demo.sh) | Re-enrols the workload and waits for attestation (run on the verifier) |
-| [`scripts/tamper.sh`](scripts/tamper.sh) | Runs an unapproved binary and times how long until access is denied (run on the workload) |
+| [`scripts/tamper.sh`](scripts/tamper.sh) | Runs an unapproved binary on the workload and times how long until access is denied (streamed from the verifier over SSH) |
 | [`scripts/test-cm-api.sh`](scripts/test-cm-api.sh) | Exercises the CipherTrust Manager REST calls the broker makes |
 
 ## How the broker decides
@@ -96,7 +96,7 @@ All settings come from environment variables, loaded by systemd from `/etc/attes
 
 1. Build the lab with [docs/RUNBOOK.md](docs/RUNBOOK.md), sections 0 to 4.
 2. Snapshot the attested workload as `clean-attested`.
-3. Demo: `cat /data/secret.txt` works. Then run `bash /root/tamper.sh` on the workload, and access is denied within seconds.
+3. Demo: `cat /data/secret.txt` works. Then, from the verifier, run `ssh root@workload.home.arpa 'bash -s' < /root/kit/scripts/tamper.sh`, and access is denied within seconds.
 4. Reset: roll back the snapshot, then run `scripts/reset-demo.sh` on the verifier.
 
 ## Licence

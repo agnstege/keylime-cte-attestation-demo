@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Run on the WORKLOAD as root, with:  bash tamper.sh
-# (Run it via bash, not ./tamper.sh: executing this file directly would itself
-#  be measured by IMA and trip attestation before the timer starts.)
+# Runs on the WORKLOAD as root. Stream it from the verifier, so nothing is left
+# on the workload and it survives snapshot rollbacks:
+#   ssh root@workload.home.arpa 'bash -s' < /root/kit/scripts/tamper.sh
+# (If you do copy it to the workload, run it with `bash tamper.sh`, never
+#  ./tamper.sh: executing the file directly would itself be measured by IMA and
+#  trip attestation before the timer starts.)
 #
 # Drops and runs an unapproved binary in /root, then times how long until
 # CTE denies access to the protected file.
