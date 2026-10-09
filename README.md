@@ -96,7 +96,7 @@ All settings come from environment variables, loaded by systemd from `/etc/attes
 
 1. Build the lab with [docs/RUNBOOK.md](docs/RUNBOOK.md), sections 0 to 4.
 2. Snapshot the attested workload as `clean-attested`.
-3. Demo: `cat /data/secret.txt` works. Then, from the verifier, run `ssh root@workload.home.arpa 'bash -s' < /root/kit/scripts/tamper.sh`, and access is denied within seconds.
+3. Demo: `cat /data/secret.txt` works. Then, from the verifier, run `ssh root@workload.home.arpa 'bash -s' < /root/keylime-cte-attestation-demo/scripts/tamper.sh`, and access is denied within seconds.
 4. Reset: roll back the snapshot, then run `scripts/reset-demo.sh` on the verifier.
 
 ## Licence
